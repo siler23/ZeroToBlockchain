@@ -70,8 +70,13 @@ function displayProfileForm ()
 {
     let toLoad = 'createConnectionProfile.html';
     $.when($.get(toLoad)).done(function (page)
-        {
-        // ========> Your Code Goes Here <=========
+        {$("#admin-forms").empty();
+        $("#admin-forms").append(page);
+        var _cancel = $("#cancel");
+        var _submit = $("#submit");
+            _cancel.on('click', function(){$("#admin-forms").empty();});
+            _submit.on('click', function(){var _vals = getConnectForm(); createConnection(_vals);});
+       
     });
 }
 

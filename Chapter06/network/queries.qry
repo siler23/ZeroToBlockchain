@@ -1,6 +1,6 @@
 /** Sample queries for Z2B FinanceCo business network
 */
-
+//Will only let you see things that are yours
 query selectOrders {
   description: "Select all Orders"
   statement:

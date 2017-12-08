@@ -44,20 +44,20 @@ exports.getMyOrders = function (req, res, next) {
     if (svc.m_connection === null) {svc.createMessageSocket();}
     let ser;
     let archiveFile = fs.readFileSync(path.join(path.dirname(require.main.filename),'network','dist','zerotoblockchain-network.bna'));
-    businessNetworkConnection = new BusinessNetworkConnection();
-    return BusinessNetworkDefinition.fromArchive(archiveFile)
+    businessNetworkConnection = new BusinessNetworkConnection(); //creates business network connection = creates instance of class
+    return BusinessNetworkDefinition.fromArchive(archiveFile) //tell it to connect
     .then((bnd) => {
         ser = bnd.getSerializer();
         //
         // v0.14
         // return businessNetworkConnection.connect(config.composer.connectionProfile, config.composer.network, req.body.userID, req.body.secret)
-        //
+        // 
         // v0.15
         console.log(method+' req.body.userID is: '+req.body.userID );
         return businessNetworkConnection.connect(req.body.userID)
         .then(() => {
-            return businessNetworkConnection.query('selectOrders')
-            .then((orders) => {
+            return businessNetworkConnection.query('selectOrders') //tell it to issue a query
+            .then((orders) => { //get an array back or orders that may be empty or have lots of things in it
                 allOrders = new Array();
                 for (let each in orders)
                     { (function (_idx, _arr)
@@ -67,7 +67,7 @@ exports.getMyOrders = function (req, res, next) {
                         allOrders.push(_jsn);
                     })(each, orders);
                 }
-                res.send({'result': 'success', 'orders': allOrders});
+                res.send({'result': 'success', 'orders': allOrders}); //send it back
             })
             .catch((error) => {console.log('selectOrders failed ', error);
                 res.send({'result': 'failed', 'error': 'selectOrders: '+error.message});
@@ -228,10 +228,10 @@ exports.addOrder = function (req, res, next) {
     return businessNetworkConnection.connect(req.body.buyer)
     .then(() => {
         factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-        let order = factory.newResource(NS, 'Order', orderNo);
-        order = svc.createOrderTemplate(order);
+        let order = factory.newResource(NS, 'Order', orderNo); //order asset created
+        order = svc.createOrderTemplate(order); 
         order.amount = 0;
-        order.orderNumber = orderNo;
+        order.orderNumber = orderNo; // populate info about order 
         order.buyer = factory.newRelationship(NS, 'Buyer', req.body.buyer);
         order.seller = factory.newRelationship(NS, 'Seller', req.body.seller);
         order.provider = factory.newRelationship(NS, 'Provider', 'noop@dummy');
@@ -245,7 +245,12 @@ exports.addOrder = function (req, res, next) {
         })(each, req.body.items);
         }
         // create the buy transaction
+       const createNew = factory.newTransactio(NS, 'CreateOrder');
 
+       createNew.order = factory.newRelationship (NS, 'Order', order.$identifier);
+       createNew.buyer = factory.newRelationship (NS,' Buyer', req.body.buyer);
+       createNew.seller = factory.newRelationship (NS, 'Seller', req.body.seller);
+       createNew.amount = order.amount;
         // add the order to the asset registry.
         return businessNetworkConnection.getAssetRegistry(NS+'.Order')
         .then((assetRegistry) => {

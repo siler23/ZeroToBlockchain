@@ -156,7 +156,7 @@ function displayOrderForm()
 /**
  * lists all orders for the selected buyer
  */
-function listOrders()
+function listOrders() //format orders
 {
     let options = {};
     // get the users email address
@@ -205,8 +205,8 @@ function formatOrders(_target, _orders)
         // Throughout this code, you will see many different objects referemced by 'textPrompts.orderProcess.(something)'
         // These are the text strings which will be displayed in the browser and are retrieved from the prompts.json file
         // associated with the language selected by the web user.
-        //
-        switch (JSON.parse(_arr[_idx].status).code)
+        //different options a buyer would have 
+        switch (JSON.parse(_arr[_idx].status).code) 
         {
         case orderStatus.PayRequest.code:
             _date = _arr[_idx].paymentRequested;
@@ -270,7 +270,7 @@ function formatOrders(_target, _orders)
         _str += '<tr><th id ="b_order'+_idx+'" width="20%">'+_arr[_idx].id+'</th><th width="50%">'+JSON.parse(_arr[_idx].status).text+': '+_date+'</th><th class="right">$'+_arr[_idx].amount+'.00</th>'+_action+r_string+_button+'</tr></table>';
         _str+= '<table class="wide"><tr align="center"><th>'+textPrompts.orderProcess.itemno+'</th><th>'+textPrompts.orderProcess.description+'</th><th>'+textPrompts.orderProcess.qty+'</th><th>'+textPrompts.orderProcess.price+'</th></tr>'
         for (let every in _arr[_idx].items)
-        {
+        { //going to drop down list to select the process
             (function(_idx2, _arr2)
                 { let _item = JSON.parse(_arr2[_idx2]);
                 _str += '<tr><td align="center" width="20%">'+_item.itemNo+'</td><td width="50%">'+_item.description+'</td><td align="center">'+_item.quantity+'</td><td align="right">$'+_item.extendedPrice+'.00</td><tr>';
